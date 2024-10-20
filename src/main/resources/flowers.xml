@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flowers>
+    <FlowerItem id="1">
+        <Name>Sunflower</Name>
+        <Soil>Loamy</Soil>
+        <Origin>North America</Origin>
+        <VisualParameters>
+            <StemColor>Green</StemColor>
+            <LeafColor>Green</LeafColor>
+            <AverageSize>200</AverageSize>
+        </VisualParameters>
+        <GrowingTips>
+            <Temperature>20</Temperature>
+            <LightLoving>true</LightLoving>
+            <Watering>500</Watering>
+        </GrowingTips>
+        <Multiplying>Seeds</Multiplying>
+    </FlowerItem>
+
+    <FlowerItem id="2">
+        <Name>Ficus</Name>
+        <Soil>Well-drained</Soil>
+        <Origin>Southeast Asia</Origin>
+        <VisualParameters>
+            <StemColor>Brown</StemColor>
+            <LeafColor>Dark Green</LeafColor>
+            <AverageSize>150</AverageSize>
+        </VisualParameters>
+        <GrowingTips>
+            <Temperature>22</Temperature>
+            <LightLoving>false</LightLoving>
+            <Watering>300</Watering>
+        </GrowingTips>
+        <Multiplying>Cuttings</Multiplying>
+    </FlowerItem>
+
+    <FlowerItem id="3">
+        <Name>Lavender</Name>
+        <Soil>Sandy</Soil>
+        <Origin>Mediterranean</Origin>
+        <VisualParameters>
+            <StemColor>Green</StemColor>
+            <LeafColor>Gray-green</LeafColor>
+            <AverageSize>60</AverageSize>
+        </VisualParameters>
+        <GrowingTips>
+            <Temperature>18</Temperature>
+            <LightLoving>true</LightLoving>
+            <Watering>200</Watering>
+        </GrowingTips>
+        <Multiplying>Seeds</Multiplying>
+    </FlowerItem>
+
+    <FlowerItem id="4">
+        <Name>Orchid</Name>
+        <Soil>Bark mix</Soil>
+        <Origin>Tropical regions</Origin>
+        <VisualParameters>
+            <StemColor>Green</StemColor>
+            <LeafColor>Green</LeafColor>
+            <AverageSize>50</AverageSize>
+        </VisualParameters>
+        <GrowingTips>
+            <Temperature>25</Temperature>
+            <LightLoving>false</LightLoving>
+            <Watering>250</Watering>
+        </GrowingTips>
+        <Multiplying>Division</Multiplying>
+    </FlowerItem>
+
+    <FlowerItem id="5">
+        <Name>Cactus</Name>
+        <Soil>Sandy, well-drained</Soil>
+        <Origin>Americas</Origin>
+        <VisualParameters>
+            <StemColor>Green</StemColor>
+            <LeafColor>N/A</LeafColor>
+            <AverageSize>30</AverageSize>
+        </VisualParameters>
+        <GrowingTips>
+            <Temperature>23</Temperature>
+            <LightLoving>true</LightLoving>
+            <Watering>50</Watering>
+        </GrowingTips>
+        <Multiplying>Offsets</Multiplying>
+    </FlowerItem>
+</Flowers>
