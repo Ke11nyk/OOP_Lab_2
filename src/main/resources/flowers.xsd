@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="Flowers">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="FlowerItem" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="Name" type="xs:string"/>
+                            <xs:element name="Soil" type="xs:string"/>
+                            <xs:element name="Origin" type="xs:string"/>
+                            <xs:element name="VisualParameters">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="StemColor" type="xs:string"/>
+                                        <xs:element name="LeafColor" type="xs:string"/>
+                                        <xs:element name="AverageSize" type="xs:decimal"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="GrowingTips">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="Temperature" type="xs:integer"/>
+                                        <xs:element name="LightLoving" type="xs:boolean"/>
+                                        <xs:element name="Watering" type="xs:integer"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="Multiplying" type="xs:string"/>
+                        </xs:sequence>
+                        <xs:attribute name="id" type="xs:positiveInteger" use="required"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
