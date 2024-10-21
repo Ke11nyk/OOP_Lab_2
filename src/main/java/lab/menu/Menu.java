@@ -9,10 +9,9 @@ import lab.transform.xslTransformer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
 
 public class Menu {
-    private Scanner scanner;
+    private InputReader inputReader;
     private String xmlFilePath;
     private String xsdFilePath;
     private String xslByOriginPath;
@@ -20,7 +19,7 @@ public class Menu {
     List<FlowerItem> flowerList;
 
     public Menu() {
-        this.scanner = new Scanner(System.in);
+        this.inputReader = new InputReader();
         this.xmlFilePath = getClass().getClassLoader().getResource("flowers.xml").getPath();
         this.xsdFilePath = getClass().getClassLoader().getResource("flowers.xsd").getPath();
         this.xslByOriginPath = getClass().getClassLoader().getResource("flowersByOrigin.xsl").getPath();
@@ -36,16 +35,14 @@ public class Menu {
         }
         System.out.println("XML validated successfully!");
 
-        String options = "\n1. Parse" +
-                "\n2. Print flower list" +
-                "\n3. Sort flower list" +
-                "\n4. Transform XML" +
-                "\n0. Exit\n";
-
         while (true) {
-            System.out.println(options);
+            System.out.println("\n1. Parse" +
+                    "\n2. Print flower list" +
+                    "\n3. Sort flower list" +
+                    "\n4. Transform XML" +
+                    "\n0. Exit");
 
-            int choice = readInt();
+            int choice = inputReader.readInt("Enter your choice:");
             switch (choice) {
                 case 1:
                     parseOptions();
@@ -82,9 +79,9 @@ public class Menu {
                 "\n1. DOM" +
                 "\n2. SAX" +
                 "\n3. StAX" +
-                "\n4. Return\n");
+                "\n4. Return");
 
-        int choice = readInt();
+        int choice = inputReader.readInt("Enter your choice:");
         switch (choice) {
             case 1:
                 System.out.println("Parsing using DOM...");
@@ -116,9 +113,9 @@ public class Menu {
                 "\n5. Temperature" +
                 "\n6. Watering" +
                 "\n7. Multiplying" +
-                "\n8. Return\n");
+                "\n8. Return");
 
-        int choice = readInt();
+        int choice = inputReader.readInt("Enter your choice:");
         switch (choice) {
             case 1:
                 Collections.sort(flowerList, FlowerComparators.byName());
@@ -160,9 +157,9 @@ public class Menu {
         System.out.println("\nTransform by:" +
                 "\n1. Origin" +
                 "\n2. Soil" +
-                "\n3. Return\n");
+                "\n3. Return");
 
-        int choice = readInt();
+        int choice = inputReader.readInt("Enter your choice:");
         switch (choice) {
             case 1:
                 System.out.println("Transforming by origin...");
@@ -179,16 +176,6 @@ public class Menu {
             default:
                 System.out.println("Invalid option. Returning to main menu.");
                 return;
-        }
-    }
-
-    private int readInt() {
-        while (true) {
-            try {
-                return Integer.parseInt(scanner.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a number.");
-            }
         }
     }
 }
