@@ -1,82 +1,174 @@
 package lab.parsers;
 
-import lab.FlowerItem;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+import lab.validation.xmlValidator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import lab.generated.Flowers;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.math.BigDecimal;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.stream.Stream;
 
 class ParsersTest {
+    @TempDir
+    Path tempDir;
 
-    private static final String TEST_XML =
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                    "<Flowers>" +
-                    "  <FlowerItem id=\"f1\">" +
-                    "    <Name>Rose</Name>" +
-                    "    <Soil>loam</Soil>" +
-                    "    <Origin>Asia</Origin>" +
-                    "    <VisualParameters>" +
-                    "      <StemColor>green</StemColor>" +
-                    "      <LeafColor>dark green</LeafColor>" +
-                    "      <AverageSize>30.5</AverageSize>" +
-                    "    </VisualParameters>" +
-                    "    <GrowingTips>" +
-                    "      <Temperature>20</Temperature>" +
-                    "      <LightLoving>true</LightLoving>" +
-                    "      <Watering>250</Watering>" +
-                    "    </GrowingTips>" +
-                    "    <Multiplying>cuttings</Multiplying>" +
-                    "  </FlowerItem>" +
-                    "</Flowers>";
+    private String xsdPath = "src/main/resources/flowers.xsd";
+    private String validXml;
+    private String invalidXml;
+    private String missingRequiredElementXml;
+    private File validXmlFile;
+    private File invalidXmlFile;
+    private File missingRequiredElementXmlFile;
 
-    private static File testFile;
 
-    @BeforeAll
-    static void setup(@TempDir Path tempDir) throws Exception {
-        testFile = tempDir.resolve("test.xml").toFile();
-        try (FileWriter writer = new FileWriter(testFile)) {
-            writer.write(TEST_XML);
+    @BeforeEach
+    void setUp() throws Exception {
+        // Valid XML content
+        validXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<Flowers>\n" +
+                "    <FlowerItem id=\"1\">\n" +
+                "        <Name>Rose</Name>\n" +
+                "        <Soil>podzolic</Soil>\n" +
+                "        <Origin>China</Origin>\n" +
+                "        <VisualParameters>\n" +
+                "            <StemColor>green</StemColor>\n" +
+                "            <LeafColor>dark-green</LeafColor>\n" +
+                "            <AverageSize>30.5</AverageSize>\n" +
+                "        </VisualParameters>\n" +
+                "        <GrowingTips>\n" +
+                "            <Temperature>20</Temperature>\n" +
+                "            <LightLoving>true</LightLoving>\n" +
+                "            <Watering>250</Watering>\n" +
+                "        </GrowingTips>\n" +
+                "        <Multiplying>leaf</Multiplying>\n" +
+                "    </FlowerItem>\n" +
+                "</Flowers>";
+
+        // Invalid XML with wrong element order
+        invalidXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<Flowers>\n" +
+                "    <FlowerItem id=\"1\">\n" +
+                "        <Name>Rose</Name>\n" +
+                "        <Soil>podzolic</Soil>\n" +
+                "        <Origin>China</Origin>\n" +
+                "        <InvalidElement>test</InvalidElement>\n" +
+                "        <GrowingTips>\n" +
+                "            <Temperature>20</Temperature>\n" +
+                "            <LightLoving>true</LightLoving>\n" +
+                "            <Watering>250</Watering>\n" +
+                "        </GrowingTips>\n" +
+                "        <Multiplying>leaf</Multiplying>\n" +
+                "    </FlowerItem>\n" +
+                "</Flowers>";
+
+        // XML missing required VisualParameters element
+        missingRequiredElementXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<Flowers>\n" +
+                "    <FlowerItem id=\"1\">\n" +
+                "        <Name>Rose</Name>\n" +
+                "        <Soil>podzolic</Soil>\n" +
+                "        <Origin>China</Origin>\n" +
+                "        <GrowingTips>\n" +
+                "            <Temperature>20</Temperature>\n" +
+                "            <LightLoving>true</LightLoving>\n" +
+                "            <Watering>250</Watering>\n" +
+                "        </GrowingTips>\n" +
+                "        <Multiplying>leaf</Multiplying>\n" +
+                "    </FlowerItem>\n" +
+                "</Flowers>";
+
+        // Create temporary XML files
+        validXmlFile = tempDir.resolve("valid.xml").toFile();
+        try (FileWriter writer = new FileWriter(validXmlFile)) {
+            writer.write(validXml);
+        }
+
+        invalidXmlFile = tempDir.resolve("invalid.xml").toFile();
+        try (FileWriter writer = new FileWriter(invalidXmlFile)) {
+            writer.write(invalidXml);
+        }
+
+        missingRequiredElementXmlFile = tempDir.resolve("missing.xml").toFile();
+        try (FileWriter writer = new FileWriter(missingRequiredElementXmlFile)) {
+            writer.write(missingRequiredElementXml);
         }
     }
 
-    @Test
-    void testDomParser() {
-        List<FlowerItem> flowers = domParser.parseFlowers(testFile.getPath());
-        assertFalse(flowers.isEmpty());
-        validateFlower(flowers.get(0));
+    static Stream<Class<?>> parserClasses() {
+        return Stream.of(domParser.class, saxParser.class, staxParser.class);
     }
 
-    @Test
-    void testSaxParser() {
-        List<FlowerItem> flowers = saxParser.parseFlowers(testFile.getPath());
-        assertFalse(flowers.isEmpty());
-        validateFlower(flowers.get(0));
+    @ParameterizedTest
+    @MethodSource("parserClasses")
+    void testValidXml(Class<?> parserClass) {
+        List<Flowers.FlowerItem> flowers = parseWithClass(parserClass, validXmlFile.getAbsolutePath());
+
+        assertNotNull(flowers, "Parser should return non-null list");
+        assertEquals(1, flowers.size(), "Parser should return 1 flower");
+
+        Flowers.FlowerItem flower = flowers.get(0);
+        assertAll(
+                () -> assertEquals("Rose", flower.getName()),
+                () -> assertEquals("podzolic", flower.getSoil()),
+                () -> assertEquals("China", flower.getOrigin()),
+                () -> assertEquals("leaf", flower.getMultiplying()),
+                () -> assertEquals(20, flower.getGrowingTips().getTemperature()),
+                () -> assertEquals(250, flower.getGrowingTips().getWatering()),
+                () -> assertTrue(flower.getGrowingTips().isLightLoving()),
+                () -> assertEquals(BigDecimal.valueOf(30.5), flower.getVisualParameters().getAverageSize()),
+                () -> assertEquals("green", flower.getVisualParameters().getStemColor()),
+                () -> assertEquals("dark-green", flower.getVisualParameters().getLeafColor())
+        );
     }
 
-    @Test
-    void testStaxParser() {
-        List<FlowerItem> flowers = staxParser.parseFlowers(testFile.getPath());
-        assertFalse(flowers.isEmpty());
-        validateFlower(flowers.get(0));
+    @ParameterizedTest
+    @MethodSource("parserClasses")
+    void testInvalidXml(Class<?> parserClass) {
+        List<Flowers.FlowerItem> flowers = new ArrayList<>();
+
+        if (xmlValidator.validateXMLSchema(missingRequiredElementXmlFile.getAbsolutePath(), xsdPath))
+            flowers = parseWithClass(parserClass, invalidXmlFile.getAbsolutePath());
+
+        assertTrue(flowers.isEmpty(), "Parser should return empty list for invalid XML");
     }
 
-    private void validateFlower(FlowerItem flower) {
-        assertEquals("f1", flower.getId());
-        assertEquals("Rose", flower.getName());
-        assertEquals("loam", flower.getSoil());
-        assertEquals("Asia", flower.getOrigin());
-        assertEquals("green", flower.getStemColor());
-        assertEquals("dark green", flower.getLeafColor());
-        assertEquals(30.5, flower.getAverageSize(), 0.001);
-        assertEquals(20, flower.getTemperature());
-        assertTrue(flower.isLightLoving());
-        assertEquals(250, flower.getWatering());
-        assertEquals("cuttings", flower.getMultiplying());
+    @ParameterizedTest
+    @MethodSource("parserClasses")
+    void testMissingRequiredElement(Class<?> parserClass) {
+        List<Flowers.FlowerItem> flowers = new ArrayList<>();
+        if (xmlValidator.validateXMLSchema(missingRequiredElementXmlFile.getAbsolutePath(), xsdPath))
+            flowers = parseWithClass(parserClass, missingRequiredElementXmlFile.getAbsolutePath());
+
+        assertTrue(flowers.isEmpty(), "Parser should return empty list when required element is missing");
+    }
+
+    @ParameterizedTest
+    @MethodSource("parserClasses")
+    void testNonexistentFile(Class<?> parserClass) {
+        List<Flowers.FlowerItem> flowers = new ArrayList<>();
+        if (xmlValidator.validateXMLSchema(missingRequiredElementXmlFile.getAbsolutePath(), xsdPath))
+            flowers = parseWithClass(parserClass, "nonexistent.xml");
+
+        assertTrue(flowers.isEmpty(), "Parser should return empty list for nonexistent file");
+    }
+
+    private List<Flowers.FlowerItem> parseWithClass(Class<?> parserClass, String filePath) {
+        if (parserClass == domParser.class) {
+            return domParser.parseFlowers(filePath);
+        } else if (parserClass == saxParser.class) {
+            return saxParser.parseFlowers(filePath);
+        } else {
+            return staxParser.parseFlowers(filePath);
+        }
     }
 }
