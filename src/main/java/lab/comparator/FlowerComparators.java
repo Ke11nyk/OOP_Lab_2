@@ -1,35 +1,34 @@
 package lab.comparator;
 
 import java.util.Comparator;
-import lab.FlowerItem;
+import lab.generated.Flowers;
 
 public class FlowerComparators {
-
-    public static Comparator<FlowerItem> byName() {
-        return Comparator.comparing(FlowerItem::getName);
+    public static Comparator<Flowers.FlowerItem> byName() {
+        return Comparator.comparing(Flowers.FlowerItem::getName);
     }
 
-    public static Comparator<FlowerItem> byOrigin() {
-        return Comparator.comparing(FlowerItem::getOrigin);
+    public static Comparator<Flowers.FlowerItem> byOrigin() {
+        return Comparator.comparing(Flowers.FlowerItem::getOrigin);
     }
 
-    public static Comparator<FlowerItem> bySoil() {
-        return Comparator.comparing(FlowerItem::getSoil);
+    public static Comparator<Flowers.FlowerItem> bySoil() {
+        return Comparator.comparing(Flowers.FlowerItem::getSoil);
     }
 
-    public static Comparator<FlowerItem> byAverageSize() {
-        return Comparator.comparing(FlowerItem::getAverageSize);
+    public static Comparator<Flowers.FlowerItem> byAverageSize() {
+        return Comparator.comparing(f -> f.getVisualParameters().getAverageSize());
     }
 
-    public static Comparator<FlowerItem> byTemperature() {
-        return Comparator.comparing(FlowerItem::getTemperature);
+    public static Comparator<Flowers.FlowerItem> byTemperature() {
+        return Comparator.comparingInt(f -> f.getGrowingTips().getTemperature());
     }
 
-    public static Comparator<FlowerItem> byWatering() {
-        return Comparator.comparing(FlowerItem::getWatering);
+    public static Comparator<Flowers.FlowerItem> byWatering() {
+        return Comparator.comparingInt(f -> f.getGrowingTips().getWatering());
     }
 
-    public static Comparator<FlowerItem> byMultiplying() {
-        return Comparator.comparing(FlowerItem::getMultiplying);
+    public static Comparator<Flowers.FlowerItem> byMultiplying() {
+        return Comparator.comparing(Flowers.FlowerItem::getMultiplying);
     }
 }

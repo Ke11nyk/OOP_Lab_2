@@ -1,10 +1,10 @@
 package lab.menu;
 
 import lab.parsers.*;
-import lab.FlowerItem;
-import lab.comparator.FlowerComparators;
+import lab.generated.Flowers;
 import lab.validation.xmlValidator;
 import lab.transform.xslTransformer;
+import lab.comparator.FlowerComparators;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +16,7 @@ public class Menu {
     private String xsdFilePath;
     private String xslByOriginPath;
     private String xslBySoilPath;
-    List<FlowerItem> flowerList;
+    List<Flowers.FlowerItem> flowerList;
 
     public Menu() {
         this.inputReader = new InputReader();
@@ -36,12 +36,7 @@ public class Menu {
         System.out.println("XML validated successfully!");
 
         while (true) {
-            System.out.println("\n1. Parse" +
-                    "\n2. Print flower list" +
-                    "\n3. Sort flower list" +
-                    "\n4. Transform XML" +
-                    "\n0. Exit");
-
+            printMainMenu();
             int choice = inputReader.readInt("Enter your choice:");
             switch (choice) {
                 case 1:
@@ -52,7 +47,7 @@ public class Menu {
                         System.out.println("Flower list is empty!");
                         break;
                     }
-                    flowerList.forEach(plant -> System.out.println(plant + "\n"));
+                    printFlowerList();
                     break;
                 case 3:
                     if (flowerList.isEmpty()) {
@@ -74,12 +69,44 @@ public class Menu {
         }
     }
 
+    private void printMainMenu() {
+        System.out.println("\n=== Main Menu ===");
+        System.out.println("1. Parse");
+        System.out.println("2. Print flower list");
+        System.out.println("3. Sort flower list");
+        System.out.println("4. Transform XML");
+        System.out.println("0. Exit");
+        System.out.println("===============");
+    }
+
+    private void printFlowerList() {
+        System.out.println("\n=== Flower List ===");
+        for (Flowers.FlowerItem flower : flowerList) {
+            System.out.printf("%s:%n", flower.getName());
+            System.out.printf("- ID: %s%n", flower.getId());
+            System.out.printf("- Soil: %s%n", flower.getSoil());
+            System.out.printf("- Origin: %s%n", flower.getOrigin());
+            System.out.println("- Visual Parameters:");
+            System.out.printf("\t* Stem Color: %s%n", flower.getVisualParameters().getStemColor());
+            System.out.printf("\t* Leaf Color: %s%n", flower.getVisualParameters().getLeafColor());
+            System.out.printf("\t* Average Size: %s cm%n", flower.getVisualParameters().getAverageSize());
+            System.out.println("- Growing Tips:");
+            System.out.printf("\t* Temperature: %d°C%n", flower.getGrowingTips().getTemperature());
+            System.out.printf("\t* Light Loving: %b%n", flower.getGrowingTips().isLightLoving());
+            System.out.printf("\t* Watering: %d ml/week%n", flower.getGrowingTips().getWatering());
+            System.out.printf("- Multiplying: %s%n", flower.getMultiplying());
+            System.out.println();
+        }
+        System.out.println("=================");
+    }
+
     private void parseOptions() {
-        System.out.println("\nParse using:" +
-                "\n1. DOM" +
-                "\n2. SAX" +
-                "\n3. StAX" +
-                "\n4. Return");
+        System.out.println("\n=== Parse Options ===");
+        System.out.println("1. DOM");
+        System.out.println("2. SAX");
+        System.out.println("3. StAX");
+        System.out.println("4. Return");
+        System.out.println("===================");
 
         int choice = inputReader.readInt("Enter your choice:");
         switch (choice) {
@@ -101,19 +128,20 @@ public class Menu {
                 System.out.println("Invalid option. Returning to main menu.");
                 return;
         }
-        System.out.println("Parsed successfully. " + flowerList.size() + " flowers loaded.");
+        System.out.printf("Parsed successfully. %d flowers loaded.%n", flowerList.size());
     }
 
     private void sortOptions() {
-        System.out.println("\nSort by:" +
-                "\n1. Name" +
-                "\n2. Origin" +
-                "\n3. Soil" +
-                "\n4. Average Size" +
-                "\n5. Temperature" +
-                "\n6. Watering" +
-                "\n7. Multiplying" +
-                "\n8. Return");
+        System.out.println("\n=== Sort Options ===");
+        System.out.println("1. Name");
+        System.out.println("2. Origin");
+        System.out.println("3. Soil");
+        System.out.println("4. Average Size");
+        System.out.println("5. Temperature");
+        System.out.println("6. Watering");
+        System.out.println("7. Multiplying");
+        System.out.println("8. Return");
+        System.out.println("==================");
 
         int choice = inputReader.readInt("Enter your choice:");
         switch (choice) {
@@ -154,22 +182,23 @@ public class Menu {
     }
 
     private void transformOptions() {
-        System.out.println("\nTransform by:" +
-                "\n1. Origin" +
-                "\n2. Soil" +
-                "\n3. Return");
+        System.out.println("\n=== Transform Options ===");
+        System.out.println("1. Origin");
+        System.out.println("2. Soil");
+        System.out.println("3. Return");
+        System.out.println("=======================");
 
         int choice = inputReader.readInt("Enter your choice:");
         switch (choice) {
             case 1:
                 System.out.println("Transforming by origin...");
                 String outputFileOrigin = xslTransformer.transform(xmlFilePath, xslByOriginPath);
-                System.out.println("Transformation complete. Output file: " + outputFileOrigin);
+                System.out.printf("Transformation complete. Output file: %s%n", outputFileOrigin);
                 break;
             case 2:
                 System.out.println("Transforming by soil...");
                 String outputFileSoil = xslTransformer.transform(xmlFilePath, xslBySoilPath);
-                System.out.println("Transformation complete. Output file: " + outputFileSoil);
+                System.out.printf("Transformation complete. Output file: %s%n", outputFileSoil);
                 break;
             case 3:
                 return;

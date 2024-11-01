@@ -1,84 +1,25 @@
 package lab.parsers;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 
-import lab.FlowerItem;
+import lab.generated.Flowers;
 
 public class saxParser {
-    public static List<FlowerItem> parseFlowers(String xmlFile) {
-        List<FlowerItem> flowerList = new ArrayList<>();
+    public static List<Flowers.FlowerItem> parseFlowers(String xmlFile) {
         try {
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            SAXParser parser = factory.newSAXParser();
+            JAXBContext context = JAXBContext.newInstance(Flowers.class);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            Flowers flowers = (Flowers) unmarshaller.unmarshal(new File(xmlFile));
 
-            DefaultHandler handler = new DefaultHandler() {
-                FlowerItem flower;
-                String currentElement = "";
-
-                public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-                    currentElement = qName;
-                    if (qName.equals("FlowerItem")) {
-                        flower = new FlowerItem();
-                        flower.setId(attributes.getValue("id"));
-                    }
-                }
-
-                public void characters(char[] ch, int start, int length) throws SAXException {
-                    String value = new String(ch, start, length).trim();
-                    if (value.isEmpty()) return;
-
-                    switch (currentElement) {
-                        case "Name":
-                            flower.setName(value);
-                            break;
-                        case "Soil":
-                            flower.setSoil(value);
-                            break;
-                        case "Origin":
-                            flower.setOrigin(value);
-                            break;
-                        case "StemColor":
-                            flower.setStemColor(value);
-                            break;
-                        case "LeafColor":
-                            flower.setLeafColor(value);
-                            break;
-                        case "AverageSize":
-                            flower.setAverageSize(Double.parseDouble(value));
-                            break;
-                        case "Temperature":
-                            flower.setTemperature(Integer.parseInt(value));
-                            break;
-                        case "LightLoving":
-                            flower.setLightLoving(Boolean.parseBoolean(value));
-                            break;
-                        case "Watering":
-                            flower.setWatering(Integer.parseInt(value));
-                            break;
-                        case "Multiplying":
-                            flower.setMultiplying(value);
-                            break;
-                    }
-                }
-
-                public void endElement(String uri, String localName, String qName) throws SAXException {
-                    if (qName.equals("FlowerItem")) {
-                        flowerList.add(flower);
-                    }
-                    currentElement = "";
-                }
-            };
-            parser.parse(xmlFile, handler);
+            return flowers.getFlowerItem();
         } catch (Exception e) {
             e.printStackTrace();
+            return new ArrayList<>();
         }
-        return flowerList;
     }
 }
